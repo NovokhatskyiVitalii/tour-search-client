@@ -1,0 +1,26 @@
+.tour-page {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.tour-page__panel {
+    padding: 32px;
+    border-radius: 24px;
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+}
+
+.tour-page__title {
+    margin: 0 0 12px;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+.tour-page__placeholder {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
