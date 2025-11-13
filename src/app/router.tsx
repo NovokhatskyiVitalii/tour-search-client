@@ -3,11 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import App from "../App";
 import SearchPage from "../pages/search/SearchPage";
 import TourPage from "../pages/tour/TourPage";
-
-export enum AppRoute {
-  Root = "/",
-  Tour = "/tour/:priceId",
-}
+import { AppRoute } from "./routes";
 
 export const router = createBrowserRouter([
   {
