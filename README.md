@@ -1,73 +1,217 @@
-# React + TypeScript + Vite
+# 🏖️ Tour Search Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern React application for searching and browsing tour offers with hotel information, built with TypeScript, Redux Toolkit, and Vite.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **🔍 Smart Search**: Autocomplete destination search with support for countries, cities, and hotels
+- **📊 Tour Results**: Display search results as responsive cards with hotel information
+- **🏨 Tour Details**: Detailed tour information page with hotel description, services, and pricing
+- **⚡ Real-time Search**: Asynchronous search with polling and retry mechanisms
+- **🔄 Search Management**: Cancel and restart search functionality
+- **💾 Persistent Storage**: Prices with hotel information preserved in localStorage after page refresh
+- **📱 Responsive Design**: Mobile-friendly UI with modern styling
 
-## React Compiler
+## 🛠️ Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Redux Toolkit** - State management
+- **React Router** - Navigation
+- **Vite** - Build tool and dev server
+- **SCSS** - Styling
+- **ESLint** - Code linting
 
-## Expanding the ESLint configuration
+## 📦 Installation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Clone the repository:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/NovokhatskyiVitalii/tour-search-client.git
+cd tour-search-client
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Install dependencies:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
 ```
+
+## 🚀 Development
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+## 🏗️ Build
+
+Build for production:
+
+```bash
+npm run build
+```
+
+Preview production build:
+
+```bash
+npm run preview
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── app/              # App configuration
+│   ├── hooks.ts      # Typed Redux hooks
+│   ├── router.tsx    # React Router configuration
+│   ├── routes.ts     # Route constants
+│   └── store.ts      # Redux store setup
+├── features/         # Feature modules
+│   └── search/       # Search feature
+│       ├── components/    # React components
+│       ├── hooks/         # Custom hooks
+│       ├── slices/        # Redux slices
+│       ├── utils/         # Utility functions
+│       └── types.ts       # TypeScript types
+├── pages/            # Page components
+│   ├── search/       # Search page
+│   └── tour/         # Tour details page
+├── scss/             # Global styles
+│   ├── base/         # Base styles (reset, typography)
+│   ├── utils/        # SCSS utilities (variables, mixins)
+│   └── global.scss   # Global stylesheet
+├── shared/           # Shared utilities
+│   └── hooks/        # Shared custom hooks
+├── types/            # Global TypeScript types
+└── ui/               # UI components
+    └── layout/       # Layout components
+```
+
+## 🔌 API
+
+The application uses a mock API (`api.js`) that simulates backend functionality. All API functions return `Promise<Response>` similar to `fetch`.
+
+### Available Endpoints
+
+- `getCountries()` - Get list of countries
+- `searchGeo(query)` - Search for countries, cities, or hotels
+- `startSearchPrices(countryID)` - Start tour price search
+- `getSearchPrices(token)` - Get search results (with polling support)
+- `stopSearchPrices(token)` - Cancel active search
+- `getHotels(countryID)` - Get hotels by country
+- `getHotel(hotelId)` - Get hotel details
+- `getPrice(priceId)` - Get price offer details
+
+For detailed API documentation, see [docs-api.md](./docs-api.md).
+
+## 🎯 Key Features Implementation
+
+### Search Flow
+
+1. User selects destination (country, city, or hotel)
+2. Search is initiated with `startSearchPrices`
+3. System polls for results using `getSearchPrices` with retry logic
+4. Results are displayed as cards with hotel information
+5. User can click on a tour to view detailed information
+
+### Search Cancellation
+
+- Previous searches are automatically cancelled when a new search starts
+- Uses `stopSearchPrices` API to cancel active searches
+- Implements race condition protection to ignore results from cancelled searches
+
+### Data Persistence
+
+- Prices with hotel information are stored in localStorage
+- Tour details page works correctly after page refresh
+- Hotel information is preserved even when searches are cancelled
+
+## 🧪 Code Quality
+
+Run linter:
+
+```bash
+npm run lint
+```
+
+## 📝 Scripts
+
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+- `npm run lint` - Run ESLint
+
+## 🌐 Deployment
+
+### Netlify
+
+The easiest way to deploy is using Netlify:
+
+#### Option 1: Deploy via Netlify UI (Recommended)
+
+1. **Sign up/Login** to [Netlify](https://www.netlify.com/)
+2. **Connect your GitHub repository**:
+   - Click "Add new site" → "Import an existing project"
+   - Select your GitHub repository
+   - Netlify will automatically detect the build settings from `netlify.toml`
+3. **Deploy**:
+   - Click "Deploy site"
+   - Netlify will build and deploy your application
+   - Your site will be available at `https://your-site-name.netlify.app`
+
+#### Option 2: Deploy via Netlify CLI
+
+1. **Install Netlify CLI**:
+
+```bash
+npm install -g netlify-cli
+```
+
+2. **Login to Netlify**:
+
+```bash
+netlify login
+```
+
+3. **Initialize and deploy**:
+
+```bash
+netlify init
+netlify deploy --prod
+```
+
+#### Netlify Configuration
+
+The project includes `netlify.toml` with the following settings:
+
+- **Build command**: `npm run build`
+- **Publish directory**: `dist`
+- **SPA routing**: All routes redirect to `index.html` for client-side routing
+
+### Other Deployment Options
+
+- **Vercel**: Import project and deploy (automatic detection)
+- **GitHub Pages**: Use GitHub Actions for deployment
+- **Any static host**: Upload the `dist/` folder after running `npm run build`
+
+### Build Output
+
+The production build is generated in the `dist/` directory and can be served by any static file server.
+
+## 📄 License
+
+See [LICENSE](./LICENSE) file for details.
+
+## 👤 Author
+
+**Vitalii Novokhatskyi**
+
+- GitHub: [@NovokhatskyiVitalii](https://github.com/NovokhatskyiVitalii)
+
+---
+
+Made with ❤️ using React and TypeScript
