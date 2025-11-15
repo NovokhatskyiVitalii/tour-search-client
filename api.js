@@ -93,6 +93,35 @@ class DB {
     };
 
     this.searches = new Map();
+    // Store prices with hotelID for getPrice API
+    this.prices = new Map();
+    // Load prices from localStorage on initialization
+    this._loadPricesFromStorage();
+  }
+
+  _loadPricesFromStorage() {
+    try {
+      const stored = localStorage.getItem("tour-search-prices");
+      if (stored) {
+        const prices = JSON.parse(stored);
+        for (const [priceId, price] of Object.entries(prices)) {
+          this.prices.set(priceId, price);
+        }
+      }
+    } catch (error) {
+      // Ignore localStorage errors
+      console.warn("Failed to load prices from localStorage:", error);
+    }
+  }
+
+  _savePricesToStorage() {
+    try {
+      const prices = Object.fromEntries(this.prices);
+      localStorage.setItem("tour-search-prices", JSON.stringify(prices));
+    } catch (error) {
+      // Ignore localStorage errors (e.g., quota exceeded)
+      console.warn("Failed to save prices to localStorage:", error);
+    }
   }
 
   getCountries = () => {
@@ -140,6 +169,7 @@ class DB {
 
   addSearch = (token, search) => {
     this.searches.set(token, search);
+    // Prices will be stored when getMockPrices is called
   };
 
   deleteSearch = (token) => {
@@ -199,15 +229,32 @@ class Search {
   }
 
   getMockPrices(db) {
+    // Use cached prices if they exist (to ensure same IDs across calls)
+    if (this._cachedPrices) {
+      return this._cachedPrices;
+    }
+
     const hotels = db.getHotelsByCountryID(this._params.countryID);
 
-    return Object.fromEntries(
+    const prices = Object.fromEntries(
       Object.entries(hotels).map(([hotelID]) => {
         const price = Price.generate();
 
         return [price.id, Object.assign(price, { hotelID })];
       })
     );
+
+    // Cache prices for this search instance
+    this._cachedPrices = prices;
+
+    // Store prices in DB for getPrice API
+    for (const [priceId, price] of Object.entries(prices)) {
+      db.prices.set(priceId, price);
+    }
+    // Save to localStorage
+    db._savePricesToStorage();
+
+    return prices;
   }
 }
 
@@ -456,7 +503,31 @@ export const getPrice = (priceId) => {
     return Promise.reject(response);
   }
 
-  const price = Object.assign(Price.generate(), { id: priceId });
+  // Try to find price with hotelID in stored prices
+  let price = db.prices.get(priceId);
+
+  // If not found in stored prices, try active searches (fallback)
+  if (!price) {
+    for (const search of db.searches.values()) {
+      const prices = search.getMockPrices(db);
+      if (prices[priceId]) {
+        price = prices[priceId];
+        // Store it for future use
+        db.prices.set(priceId, price);
+        db._savePricesToStorage();
+        break;
+      }
+    }
+  }
+
+  // If not found anywhere, generate new price without hotelID
+  if (!price) {
+    price = Object.assign(Price.generate(), { id: priceId });
+  } else {
+    // Create a copy to avoid mutating the stored price
+    price = Object.assign({}, price, { id: priceId });
+  }
+
   const response = new Response(JSON.stringify(price), {
     status: 200,
     headers: {

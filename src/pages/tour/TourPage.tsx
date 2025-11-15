@@ -40,7 +40,7 @@ const TourPage = () => {
       return;
     }
 
-    // try to get hotelId from cache
+    // try to get hotelId from cache (optional optimization)
     const cachedPrice = toursPrices[priceId];
     const hotelId = cachedPrice?.hotelID;
 
@@ -51,7 +51,8 @@ const TourPage = () => {
     return () => {
       dispatch(resetTourDetails());
     };
-  }, [priceId, dispatch, navigate, toursPrices]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [priceId, dispatch, navigate]);
 
   if (status === "loading") {
     return (

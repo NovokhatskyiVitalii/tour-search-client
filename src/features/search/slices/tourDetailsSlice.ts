@@ -3,16 +3,12 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { getHotel, getPrice } from "#api";
 import type { HotelDetails } from "../types";
 import type { PriceOffer } from "./toursSlice";
+import { readJson } from "../utils/api";
 
 type ErrorResponse = {
   code: number;
   error: true;
   message: string;
-};
-
-const readJson = async <T>(response: Response): Promise<T | ErrorResponse> => {
-  const payload = (await response.json()) as T | ErrorResponse;
-  return payload;
 };
 
 export const fetchTourDetails = createAsyncThunk<
@@ -39,6 +35,11 @@ export const fetchTourDetails = createAsyncThunk<
 
       // if hotelId is passed or exists in price, load hotel
       const targetHotelId = hotelId || price.hotelID;
+
+      // Debug: log price data to check if hotelID is present
+      if (!targetHotelId) {
+        console.warn("No hotelID found in price:", price);
+      }
       if (targetHotelId) {
         try {
           // getHotel accepts string | number, try to convert to number if possible

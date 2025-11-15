@@ -1,0 +1,8 @@
+// variables and mixins
+@use "@/styles/utils/variables";
+@use "@/styles/utils/mixins";
+
+// base styles
+@use "@/styles/base/reset";
+@use "@/styles/base/default";
+@use "@/styles/base/typography";
