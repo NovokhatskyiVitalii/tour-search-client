@@ -6,6 +6,7 @@ const selectSearchState = (state: RootState) => state.search;
 const selectFormState = (state: RootState) => selectSearchState(state).form;
 const selectSuggestionsState = (state: RootState) =>
   selectSearchState(state).suggestions;
+const selectToursState = (state: RootState) => selectSearchState(state).tours;
 
 export const selectInputValue = createSelector(
   selectFormState,
@@ -55,4 +56,24 @@ export const selectSearchError = createSelector(
 export const selectLastQuery = createSelector(
   selectSuggestionsState,
   (suggestions) => suggestions.lastQuery
+);
+
+export const selectToursPrices = createSelector(
+  selectToursState,
+  (tours) => tours.prices
+);
+
+export const selectToursStatus = createSelector(
+  selectToursState,
+  (tours) => tours.status
+);
+
+export const selectToursError = createSelector(
+  selectToursState,
+  (tours) => tours.error
+);
+
+export const selectToursActiveToken = createSelector(
+  selectToursState,
+  (tours) => tours.activeToken
 );

@@ -1,0 +1,8 @@
+// variables and mixins
+@use "@/scss/utils/variables";
+@use "@/scss/utils/mixins";
+
+// base styles
+@use "@/scss/base/reset";
+@use "@/scss/base/default";
+@use "@/scss/base/typography";
