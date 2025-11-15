@@ -166,16 +166,19 @@ The easiest way to deploy is using Netlify:
 #### Option 2: Deploy via Netlify CLI
 
 1. **Install Netlify CLI**:
+
 ```bash
 npm install -g netlify-cli
 ```
 
 2. **Login to Netlify**:
+
 ```bash
 netlify login
 ```
 
 3. **Initialize and deploy**:
+
 ```bash
 netlify init
 netlify deploy --prod
@@ -184,6 +187,7 @@ netlify deploy --prod
 #### Netlify Configuration
 
 The project includes `netlify.toml` with the following settings:
+
 - **Build command**: `npm run build`
 - **Publish directory**: `dist`
 - **SPA routing**: All routes redirect to `index.html` for client-side routing
