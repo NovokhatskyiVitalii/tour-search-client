@@ -61,7 +61,7 @@ export const cancelSearch = createAsyncThunk<
       throw new Error(errorData.message ?? "Не вдалося скасувати пошук");
     }
   } catch (error) {
-    // Игнорируем ошибки отмены (токен может быть уже недействителен)
+    // Ignore cancellation errors (token may already be invalid)
     console.warn("Failed to cancel search:", error);
   }
 });
@@ -73,7 +73,7 @@ export const searchTours = createAsyncThunk<
 >(
   "search/tours/searchTours",
   async ({ countryID }, { rejectWithValue, signal, getState, dispatch }) => {
-    // Отменяем предыдущий поиск, если он активен
+    // Cancel previous search if it's active
     const currentState = getState();
     const activeToken = currentState.search.tours.activeToken;
     if (activeToken) {
@@ -100,8 +100,8 @@ export const searchTours = createAsyncThunk<
       const token = startData.token;
       let waitUntilTime: string = startData.waitUntil;
 
-      // Сохраняем токен в state через dispatch
-      // Используем прямой dispatch с типом action
+      // Save token to state via dispatch
+      // Use direct dispatch with action type
       dispatch({ type: "search/tours/setActiveToken", payload: token });
 
       while (true) {
@@ -109,7 +109,7 @@ export const searchTours = createAsyncThunk<
           throw new Error("Search cancelled");
         }
 
-        // Проверяем, не изменился ли токен (новый поиск начался)
+        // Check if token has changed (new search started)
         const latestState = getState();
         if (latestState.search.tours.activeToken !== token) {
           throw new Error("Search cancelled");
@@ -214,12 +214,12 @@ const toursSlice = createSlice({
       .addCase(searchTours.pending, (state) => {
         state.status = "loading";
         state.error = null;
-        // Токен будет установлен после успешного startSearchPrices
-        // Пока оставляем null, чтобы не блокировать отмену старого поиска
+        // Token will be set after successful startSearchPrices
+        // Keep null for now to not block cancellation of old search
       })
       .addCase(searchTours.fulfilled, (state, action) => {
-        // Применяем результат только если поиск все еще активен (status === "loading")
-        // Если начался новый поиск, status уже изменился, и мы игнорируем старый результат
+        // Apply result only if search is still active (status === "loading")
+        // If new search started, status already changed, and we ignore old result
         if (state.status === "loading") {
           state.status = "succeeded";
           state.prices = action.payload;
@@ -227,9 +227,9 @@ const toursSlice = createSlice({
         }
       })
       .addCase(searchTours.rejected, (state, action) => {
-        // Игнорируем ошибки отмены
+        // Ignore cancellation errors
         if (action.payload === "Search cancelled") {
-          // Если поиск был отменен, просто сбрасываем состояние
+          // If search was cancelled, just reset state
           if (state.activeToken) {
             state.activeToken = null;
           }
@@ -240,7 +240,7 @@ const toursSlice = createSlice({
         state.activeToken = null;
       })
       .addCase(cancelSearch.fulfilled, (state) => {
-        // После отмены сбрасываем токен
+        // Reset token after cancellation
         state.activeToken = null;
       }),
 });
