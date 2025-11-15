@@ -7,14 +7,15 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
+      "#api": path.resolve(__dirname, "api.js"),
     },
   },
   css: {
     preprocessorOptions: {
       scss: {
         additionalData: `
-          @use "@/styles/utils/variables" as *;
-          @use "@/styles/utils/mixins" as *;
+          @use "@/scss/utils/variables" as *;
+          @use "@/scss/utils/mixins" as *;
         `,
       },
     },

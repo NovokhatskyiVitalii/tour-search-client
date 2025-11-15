@@ -1,7 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
 
+import { searchReducer } from "../features/search";
+
 export const store = configureStore({
-  reducer: {},
+  reducer: {
+    search: searchReducer,
+  },
   devTools: true,
 });
 
