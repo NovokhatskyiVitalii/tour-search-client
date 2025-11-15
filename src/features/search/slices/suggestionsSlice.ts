@@ -8,16 +8,8 @@ import type {
   GeoResponseMap,
   SearchOption,
 } from "../types";
+import { readJsonOrThrow } from "../utils/api";
 
-const readJson = async <T>(response: Response) => {
-  const payload = (await response.json()) as T;
-  if (!response.ok) {
-    const message =
-      (payload as { message?: string }).message ?? "Request failed";
-    throw new Error(message);
-  }
-  return payload;
-};
 
 const geoEntityToOption = (entity: GeoEntity): SearchOption => {
   if (entity.type === "country") {
@@ -74,7 +66,7 @@ export const fetchCountries = createAsyncThunk<
 >("search/suggestions/fetchCountries", async (_, { rejectWithValue }) => {
   try {
     const response = await getCountries();
-    const data = await readJson<CountriesMap>(response);
+    const data = await readJsonOrThrow<CountriesMap>(response);
     return mapCountries(data);
   } catch (error) {
     return rejectWithValue(
@@ -95,7 +87,7 @@ export const searchGeo = createAsyncThunk<
 
   try {
     const response = await searchGeoApi(trimmed);
-    const data = await readJson<GeoResponseMap>(response);
+    const data = await readJsonOrThrow<GeoResponseMap>(response);
     return { options: mapGeoToOptions(data), query: trimmed };
   } catch (error) {
     return rejectWithValue(

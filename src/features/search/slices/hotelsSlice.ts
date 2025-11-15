@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import { getHotels } from "#api";
+import { readJsonOrThrow } from "../utils/api";
 
 export type Hotel = {
   id: number;
@@ -16,14 +17,6 @@ export type HotelsMap = Record<string, Hotel>;
 
 type HotelsResponse = HotelsMap;
 
-const readJson = async <T>(response: Response): Promise<T> => {
-  const payload = (await response.json()) as T;
-  if (!response.ok) {
-    throw new Error("Failed to fetch hotels");
-  }
-  return payload;
-};
-
 export const fetchHotels = createAsyncThunk<
   HotelsMap,
   { countryID: string },
@@ -31,7 +24,10 @@ export const fetchHotels = createAsyncThunk<
 >("search/hotels/fetchHotels", async ({ countryID }, { rejectWithValue }) => {
   try {
     const response = await getHotels(countryID);
-    const data = await readJson<HotelsResponse>(response);
+    const data = await readJsonOrThrow<HotelsResponse>(
+      response,
+      "Не вдалося завантажити готелі"
+    );
     return data;
   } catch (error) {
     return rejectWithValue(

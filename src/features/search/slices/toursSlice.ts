@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import { getSearchPrices, startSearchPrices, stopSearchPrices } from "#api";
+import { readJson } from "../utils/api";
 
 export type PriceOffer = {
   id: string;
@@ -29,10 +30,6 @@ type ErrorResponse = {
   waitUntil?: string;
 };
 
-const readJson = async <T>(response: Response): Promise<T | ErrorResponse> => {
-  const payload = (await response.json()) as T | ErrorResponse;
-  return payload;
-};
 
 const waitUntil = (isoString: string, signal?: AbortSignal): Promise<void> => {
   const targetTime = new Date(isoString).getTime();
@@ -88,7 +85,7 @@ export const searchTours = createAsyncThunk<
         throw new Error(errorData.message ?? "Не вдалося запустити пошук");
       }
 
-      const startDataRaw = await readJson<StartSearchResponse>(startResponse);
+      const startDataRaw = await readJson<StartSearchResponse | ErrorResponse>(startResponse);
       if ("error" in startDataRaw) {
         throw new Error(
           (startDataRaw as ErrorResponse).message ??
@@ -100,9 +97,8 @@ export const searchTours = createAsyncThunk<
       const token = startData.token;
       let waitUntilTime: string = startData.waitUntil;
 
-      // Save token to state via dispatch
-      // Use direct dispatch with action type
-      dispatch({ type: "search/tours/setActiveToken", payload: token });
+      // Save token to state
+      dispatch(setActiveToken(token));
 
       while (true) {
         if (signal.aborted) {
