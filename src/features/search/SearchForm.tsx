@@ -17,14 +17,16 @@ const SearchForm = () => {
   const toursStatus = useAppSelector(selectToursStatus);
   const toursError = useAppSelector(selectToursError);
 
-  const isCountrySelected = selected?.type === "country" && selected?.countryId;
+  // Search works for any selected option if it has countryId
+  // (country, city or hotel - all of them belong to a country)
+  const canSearch = selected?.countryId !== undefined;
 
   const isLoading = toursStatus === "loading";
-  const isDisabled = !isCountrySelected || isLoading;
+  const isDisabled = !canSearch || isLoading;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isCountrySelected && selected.countryId) {
+    if (canSearch && selected.countryId) {
       dispatch(searchTours({ countryID: selected.countryId }));
     }
   };
