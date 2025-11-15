@@ -42,9 +42,33 @@ const ToursSearchResults = () => {
         hotelId: price.hotelID || "",
       }));
 
+    // Фильтрация по выбранному городу или отелю
+    let filteredHotels = hotels;
+    if (selectedOption) {
+      if (
+        selectedOption.type === "city" &&
+        selectedOption.entity.type === "city"
+      ) {
+        // Фильтруем отели по выбранному городу
+        const cityId = selectedOption.entity.id;
+        filteredHotels = Object.fromEntries(
+          Object.entries(hotels).filter(([, hotel]) => hotel.cityId === cityId)
+        );
+      } else if (
+        selectedOption.type === "hotel" &&
+        selectedOption.entity.type === "hotel"
+      ) {
+        // Фильтруем отели по выбранному отелю
+        const hotelId = String(selectedOption.entity.id);
+        filteredHotels = {
+          [hotelId]: hotels[hotelId],
+        };
+      }
+    }
+
     return pricesArray
       .map(({ price, hotelId }) => {
-        const hotel = hotelId ? hotels[hotelId] : null;
+        const hotel = hotelId ? filteredHotels[hotelId] : null;
         return hotel ? { price, hotel } : null;
       })
       .filter(
@@ -56,7 +80,7 @@ const ToursSearchResults = () => {
         } => item !== null
       )
       .sort((a, b) => a.price.amount - b.price.amount);
-  }, [prices, countryID, hotelsByCountry]);
+  }, [prices, countryID, hotelsByCountry, selectedOption]);
 
   const pricesCount = Object.keys(prices).length;
   const isEmpty = status === "succeeded" && pricesCount === 0;

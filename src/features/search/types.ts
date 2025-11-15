@@ -48,3 +48,16 @@ export type Selection = {
   countryId?: string;
   entity: GeoEntity;
 };
+
+export type HotelServices = {
+  wifi?: "yes" | "no" | "none";
+  aquapark?: "yes" | "no" | "none";
+  tennis_court?: "yes" | "no" | "none";
+  laundry?: "yes" | "no" | "none";
+  parking?: "yes" | "no" | "none";
+};
+
+export type HotelDetails = Hotel & {
+  description?: string;
+  services?: HotelServices;
+};

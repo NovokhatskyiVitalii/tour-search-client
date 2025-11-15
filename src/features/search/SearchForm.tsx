@@ -17,14 +17,16 @@ const SearchForm = () => {
   const toursStatus = useAppSelector(selectToursStatus);
   const toursError = useAppSelector(selectToursError);
 
-  const isCountrySelected = selected?.type === "country" && selected?.countryId;
+  // Поиск работает для любой выбранной опции, если у неё есть countryId
+  // (страна, город или отель - все они относятся к стране)
+  const canSearch = selected?.countryId !== undefined;
 
   const isLoading = toursStatus === "loading";
-  const isDisabled = !isCountrySelected || isLoading;
+  const isDisabled = !canSearch || isLoading;
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (isCountrySelected && selected.countryId) {
+    if (canSearch && selected.countryId) {
       dispatch(searchTours({ countryID: selected.countryId }));
     }
   };
