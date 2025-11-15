@@ -89,3 +89,26 @@ export const selectHotelsStatus = createSelector(
   selectHotelsState,
   (hotels) => hotels.status
 );
+
+const selectTourDetailsState = (state: RootState) =>
+  selectSearchState(state).tourDetails;
+
+export const selectTourDetailsPrice = createSelector(
+  selectTourDetailsState,
+  (tourDetails) => tourDetails.price
+);
+
+export const selectTourDetailsHotel = createSelector(
+  selectTourDetailsState,
+  (tourDetails) => tourDetails.hotel
+);
+
+export const selectTourDetailsStatus = createSelector(
+  selectTourDetailsState,
+  (tourDetails) => tourDetails.status
+);
+
+export const selectTourDetailsError = createSelector(
+  selectTourDetailsState,
+  (tourDetails) => tourDetails.error
+);
