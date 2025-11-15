@@ -56,3 +56,31 @@ export const selectLastQuery = createSelector(
   selectSuggestionsState,
   (suggestions) => suggestions.lastQuery
 );
+
+const selectToursState = (state: RootState) => selectSearchState(state).tours;
+const selectHotelsState = (state: RootState) => selectSearchState(state).hotels;
+
+export const selectToursPrices = createSelector(
+  selectToursState,
+  (tours) => tours.prices
+);
+
+export const selectToursStatus = createSelector(
+  selectToursState,
+  (tours) => tours.status
+);
+
+export const selectToursError = createSelector(
+  selectToursState,
+  (tours) => tours.error
+);
+
+export const selectHotelsByCountry = createSelector(
+  selectHotelsState,
+  (hotels) => hotels.hotelsByCountry
+);
+
+export const selectHotelsStatus = createSelector(
+  selectHotelsState,
+  (hotels) => hotels.status
+);
