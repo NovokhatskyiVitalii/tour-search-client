@@ -2,6 +2,12 @@
 
 A modern React application for searching and browsing tour offers with hotel information, built with TypeScript, Redux Toolkit, and Vite.
 
+## 🌐 Live Demo
+
+**👉 [View Live Demo](https://earnest-biscochitos-9a1a8c.netlify.app/)**
+
+The application is deployed on Netlify and available at: https://earnest-biscochitos-9a1a8c.netlify.app/
+
 ## ✨ Features
 
 - **🔍 Smart Search**: Autocomplete destination search with support for countries, cities, and hotels
