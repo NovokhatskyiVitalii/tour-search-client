@@ -2,6 +2,27 @@
     margin-top: 32px;
 }
 
+.tours-search-results__container {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+.tours-search-results__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+
+    @media (max-width: 600px) {
+        grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 601px) {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
 .tours-search-results__state {
     padding: 48px 32px;
     text-align: center;

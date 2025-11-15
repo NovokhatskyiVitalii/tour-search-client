@@ -58,6 +58,8 @@ export const selectLastQuery = createSelector(
   (suggestions) => suggestions.lastQuery
 );
 
+const selectHotelsState = (state: RootState) => selectSearchState(state).hotels;
+
 export const selectToursPrices = createSelector(
   selectToursState,
   (tours) => tours.prices
@@ -76,4 +78,14 @@ export const selectToursError = createSelector(
 export const selectToursActiveToken = createSelector(
   selectToursState,
   (tours) => tours.activeToken
+);
+
+export const selectHotelsByCountry = createSelector(
+  selectHotelsState,
+  (hotels) => hotels.hotelsByCountry
+);
+
+export const selectHotelsStatus = createSelector(
+  selectHotelsState,
+  (hotels) => hotels.status
 );
