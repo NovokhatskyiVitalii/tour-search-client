@@ -25,12 +25,14 @@ A modern React application for searching and browsing tour offers with hotel inf
 ## 📦 Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/NovokhatskyiVitalii/tour-search-client.git
 cd tour-search-client
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -145,11 +147,52 @@ npm run lint
 
 ## 🌐 Deployment
 
-The application can be deployed to any static hosting service:
+### Netlify
 
-- **Netlify**: Connect your GitHub repository and deploy automatically
-- **Vercel**: Import project and deploy
+The easiest way to deploy is using Netlify:
+
+#### Option 1: Deploy via Netlify UI (Recommended)
+
+1. **Sign up/Login** to [Netlify](https://www.netlify.com/)
+2. **Connect your GitHub repository**:
+   - Click "Add new site" → "Import an existing project"
+   - Select your GitHub repository
+   - Netlify will automatically detect the build settings from `netlify.toml`
+3. **Deploy**:
+   - Click "Deploy site"
+   - Netlify will build and deploy your application
+   - Your site will be available at `https://your-site-name.netlify.app`
+
+#### Option 2: Deploy via Netlify CLI
+
+1. **Install Netlify CLI**:
+```bash
+npm install -g netlify-cli
+```
+
+2. **Login to Netlify**:
+```bash
+netlify login
+```
+
+3. **Initialize and deploy**:
+```bash
+netlify init
+netlify deploy --prod
+```
+
+#### Netlify Configuration
+
+The project includes `netlify.toml` with the following settings:
+- **Build command**: `npm run build`
+- **Publish directory**: `dist`
+- **SPA routing**: All routes redirect to `index.html` for client-side routing
+
+### Other Deployment Options
+
+- **Vercel**: Import project and deploy (automatic detection)
 - **GitHub Pages**: Use GitHub Actions for deployment
+- **Any static host**: Upload the `dist/` folder after running `npm run build`
 
 ### Build Output
 
