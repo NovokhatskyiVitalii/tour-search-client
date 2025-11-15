@@ -1,5 +1,6 @@
 import Container from "../../ui/layout/Container/Container";
 import SearchForm from "../../features/search/SearchForm";
+import ToursSearchResults from "../../features/search/components/ToursSearchResults";
 
 import "./SearchPage.scss";
 
@@ -14,6 +15,7 @@ const SearchPage = () => {
           </p>
 
           <SearchForm />
+          <ToursSearchResults />
         </div>
       </Container>
     </section>
