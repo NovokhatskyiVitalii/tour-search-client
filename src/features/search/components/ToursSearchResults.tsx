@@ -42,14 +42,14 @@ const ToursSearchResults = () => {
         hotelId: price.hotelID || "",
       }));
 
-    // Фильтрация по выбранному городу или отелю
+    // Filter by selected city or hotel
     let filteredHotels = hotels;
     if (selectedOption) {
       if (
         selectedOption.type === "city" &&
         selectedOption.entity.type === "city"
       ) {
-        // Фильтруем отели по выбранному городу
+        // Filter hotels by selected city
         const cityId = selectedOption.entity.id;
         filteredHotels = Object.fromEntries(
           Object.entries(hotels).filter(([, hotel]) => hotel.cityId === cityId)
@@ -58,7 +58,7 @@ const ToursSearchResults = () => {
         selectedOption.type === "hotel" &&
         selectedOption.entity.type === "hotel"
       ) {
-        // Фильтруем отели по выбранному отелю
+        // Filter hotels by selected hotel
         const hotelId = String(selectedOption.entity.id);
         filteredHotels = {
           [hotelId]: hotels[hotelId],

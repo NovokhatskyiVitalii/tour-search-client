@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { getSearchPrices, startSearchPrices } from "#api";
+import { getSearchPrices, startSearchPrices, stopSearchPrices } from "#api";
 
 export type PriceOffer = {
   id: string;
@@ -34,20 +34,51 @@ const readJson = async <T>(response: Response): Promise<T | ErrorResponse> => {
   return payload;
 };
 
-const waitUntil = (isoString: string): Promise<void> => {
+const waitUntil = (isoString: string, signal?: AbortSignal): Promise<void> => {
   const targetTime = new Date(isoString).getTime();
   const now = Date.now();
   const delay = Math.max(0, targetTime - now);
-  return new Promise((resolve) => setTimeout(resolve, delay));
+  return new Promise((resolve, reject) => {
+    const timeoutId = setTimeout(resolve, delay);
+    if (signal) {
+      signal.addEventListener("abort", () => {
+        clearTimeout(timeoutId);
+        reject(new Error("Search cancelled"));
+      });
+    }
+  });
 };
+
+export const cancelSearch = createAsyncThunk<
+  void,
+  { token: string },
+  { rejectValue: string }
+>("search/tours/cancelSearch", async ({ token }) => {
+  try {
+    const response = await stopSearchPrices(token);
+    if (!response.ok) {
+      const errorData = await readJson<ErrorResponse>(response);
+      throw new Error(errorData.message ?? "Не вдалося скасувати пошук");
+    }
+  } catch (error) {
+    // Ignore cancellation errors (token may already be invalid)
+    console.warn("Failed to cancel search:", error);
+  }
+});
 
 export const searchTours = createAsyncThunk<
   PricesMap,
   { countryID: string },
-  { rejectValue: string }
+  { rejectValue: string; state: { search: { tours: ToursState } } }
 >(
   "search/tours/searchTours",
-  async ({ countryID }, { rejectWithValue, signal }) => {
+  async ({ countryID }, { rejectWithValue, signal, getState, dispatch }) => {
+    // Cancel previous search if it's active
+    const currentState = getState();
+    const activeToken = currentState.search.tours.activeToken;
+    if (activeToken) {
+      await dispatch(cancelSearch({ token: activeToken }));
+    }
     const maxRetries = 2;
 
     try {
@@ -69,12 +100,22 @@ export const searchTours = createAsyncThunk<
       const token = startData.token;
       let waitUntilTime: string = startData.waitUntil;
 
+      // Save token to state via dispatch
+      // Use direct dispatch with action type
+      dispatch({ type: "search/tours/setActiveToken", payload: token });
+
       while (true) {
         if (signal.aborted) {
           throw new Error("Search cancelled");
         }
 
-        await waitUntil(waitUntilTime);
+        // Check if token has changed (new search started)
+        const latestState = getState();
+        if (latestState.search.tours.activeToken !== token) {
+          throw new Error("Search cancelled");
+        }
+
+        await waitUntil(waitUntilTime, signal);
 
         let retryCount = 0;
         let pricesData: GetSearchPricesResponse | ErrorResponse | null = null;
@@ -164,25 +205,46 @@ const toursSlice = createSlice({
       state.error = null;
       state.activeToken = null;
     },
+    setActiveToken(state, action: { payload: string }) {
+      state.activeToken = action.payload;
+    },
   },
   extraReducers: (builder) =>
     builder
       .addCase(searchTours.pending, (state) => {
         state.status = "loading";
         state.error = null;
+        // Token will be set after successful startSearchPrices
+        // Keep null for now to not block cancellation of old search
       })
       .addCase(searchTours.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.prices = action.payload;
-        state.activeToken = null;
+        // Apply result only if search is still active (status === "loading")
+        // If new search started, status already changed, and we ignore old result
+        if (state.status === "loading") {
+          state.status = "succeeded";
+          state.prices = action.payload;
+          state.activeToken = null;
+        }
       })
       .addCase(searchTours.rejected, (state, action) => {
+        // Ignore cancellation errors
+        if (action.payload === "Search cancelled") {
+          // If search was cancelled, just reset state
+          if (state.activeToken) {
+            state.activeToken = null;
+          }
+          return;
+        }
         state.status = "failed";
         state.error = action.payload ?? "Не вдалося виконати пошук турів";
+        state.activeToken = null;
+      })
+      .addCase(cancelSearch.fulfilled, (state) => {
+        // Reset token after cancellation
         state.activeToken = null;
       }),
 });
 
-export const { resetTours } = toursSlice.actions;
+export const { resetTours, setActiveToken } = toursSlice.actions;
 
 export const toursReducer = toursSlice.reducer;

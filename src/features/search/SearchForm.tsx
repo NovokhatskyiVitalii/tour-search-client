@@ -17,8 +17,8 @@ const SearchForm = () => {
   const toursStatus = useAppSelector(selectToursStatus);
   const toursError = useAppSelector(selectToursError);
 
-  // Поиск работает для любой выбранной опции, если у неё есть countryId
-  // (страна, город или отель - все они относятся к стране)
+  // Search works for any selected option if it has countryId
+  // (country, city or hotel - all of them belong to a country)
   const canSearch = selected?.countryId !== undefined;
 
   const isLoading = toursStatus === "loading";
